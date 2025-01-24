@@ -1,0 +1,85 @@
+name: "libernetix"
+
+x-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "5"
+
+x-env-file: &env-file
+  - path: .env
+    required: true
+
+x-healthcheck: &healthcheck
+  test: wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/healthcheck || exit 1
+  start_period: 5s
+  start_interval: 1s
+  retries: 3
+  timeout: 10s
+  interval: 30s
+
+services:
+
+  traefik:
+    image: traefik:v3.0
+    container_name: "traefik"
+    restart: always
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    logging: *logging
+    depends_on:
+      gateway:
+        condition: service_started
+
+  gateway:
+    build:
+      context: apps/libernetix-gateway
+      dockerfile: ../../.docker/backend.Dockerfile
+    restart: always
+    logging: *logging
+    env_file: *env-file
+#    healthcheck: *healthcheck
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gateway-forwarding.rule=PathPrefix(`/api`)
+      - traefik.http.routers.gateway-forwarding.service=gateway-backend
+      - traefik.http.services.gateway-backend.loadbalancer.server.port=3000
+    deploy:
+      mode: replicated
+      replicas: ${REPLICAS_COUNT}
+      endpoint_mode: vip
+      update_config:
+        parallelism: 1
+        delay: 1s
+        order: stop-first
+
+  payment-form:
+    build:
+      context: apps/payment-form
+      dockerfile: ../../.docker/frontend.Dockerfile
+    restart: always
+    logging: *logging
+    env_file: *env-file
+    #    healthcheck: *healthcheck
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.payment-form-forwarding.rule=PathPrefix(`/`)
+      - traefik.http.routers.payment-form-forwarding.service=payment-form-backend
+      - traefik.http.services.payment-form-backend.loadbalancer.server.port=80
+    deploy:
+      mode: replicated
+      replicas: ${REPLICAS_COUNT}
+      endpoint_mode: vip
+      update_config:
+        parallelism: 1
+        delay: 1s
+        order: stop-first
+
+
+
