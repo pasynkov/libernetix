@@ -1,14 +1,27 @@
 # Libernetix example service
 
+First of all you have to rename `./apps/libernetix/.env.example` to `./apps/libernetix/.env` and set the environment variables.
 
-openapi-generator-cli generate -i https://gate.libernetix.com/api/schema/v1/ -g typescript-fetch -o ./src/modules/libernetix-connector/openapi --skip-validate-spec --additional-properties=generateApis=false,supportsES6=true
+
+## docker compose start
+
+```bash
+docker compose up --build --force-create
+```
+Open http://localhost/ in your browser.
+
+## npm start
+
+```bash
+npm i
+npm start
+```
+
+Open http://localhost:3001/ in your browser.
 
 
-npx openapi-typescript https://gate.libernetix.com/api/schema/v1/ --output ./src/modules/libernetix-connector/openapi/index.ts
+## monitor and metrics
+Provide env MONITOR_PORT (default 3002) in env file.
 
-openapi-generator-cli generate \
--i https://gate.libernetix.com/api/schema/v1/ \
--g typescript-fetch \
--o ./src/modules/libernetix-connector/openapi \
---skip-validate-spec \
---additional-properties=generateApis=false,supportsES6=true,defaultOptional=true
+http://localhost:3002/metrics - Prometheus metrics
+http://localhost:3002/healthy - Health check

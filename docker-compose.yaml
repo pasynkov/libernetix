@@ -6,12 +6,8 @@ x-logging: &logging
     max-size: "50m"
     max-file: "5"
 
-x-env-file: &env-file
-  - path: .env
-    required: true
-
 x-healthcheck: &healthcheck
-  test: wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/healthcheck || exit 1
+  test: wget --no-verbose --tries=1 --spider http://127.0.0.1:3002/healthy || exit 1
   start_period: 5s
   start_interval: 1s
   retries: 3
@@ -35,7 +31,7 @@ services:
     logging: *logging
     depends_on:
       gateway:
-        condition: service_started
+        condition: service_healthy
 
   gateway:
     build:
@@ -43,8 +39,12 @@ services:
       dockerfile: ../../.docker/backend.Dockerfile
     restart: always
     logging: *logging
-    env_file: *env-file
-#    healthcheck: *healthcheck
+    env_file:
+      - path: apps/libernetix-gateway/.env
+        required: true
+    environment:
+      MONITOR_PORT: 3002
+    healthcheck: *healthcheck
     labels:
       - traefik.enable=true
       - traefik.http.routers.gateway-forwarding.rule=PathPrefix(`/api`)
@@ -52,7 +52,7 @@ services:
       - traefik.http.services.gateway-backend.loadbalancer.server.port=3000
     deploy:
       mode: replicated
-      replicas: ${REPLICAS_COUNT}
+      replicas: ${REPLICAS_COUNT:-2}
       endpoint_mode: vip
       update_config:
         parallelism: 1
@@ -65,8 +65,6 @@ services:
       dockerfile: ../../.docker/frontend.Dockerfile
     restart: always
     logging: *logging
-    env_file: *env-file
-    #    healthcheck: *healthcheck
     labels:
       - traefik.enable=true
       - traefik.http.routers.payment-form-forwarding.rule=PathPrefix(`/`)
@@ -74,7 +72,7 @@ services:
       - traefik.http.services.payment-form-backend.loadbalancer.server.port=80
     deploy:
       mode: replicated
-      replicas: ${REPLICAS_COUNT}
+      replicas: ${REPLICAS_COUNT:-2}
       endpoint_mode: vip
       update_config:
         parallelism: 1

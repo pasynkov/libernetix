@@ -18,12 +18,12 @@ function App() {
   const [errors, setErrors] = useState<string[]>([]);
 
   const formInitial: FormData = {
-    cardNumber: "4444333322221111",
-    cardHolder: "Nikolay Pasynkov",
-    expiryDate: "12/25",
-    email: "test@email.com",
-    cvv: "123",
-    amount: "10",
+    cardNumber: "",
+    cardHolder: "",
+    expiryDate: "",
+    email: "",
+    cvv: "",
+    amount: "",
     currency: "EUR",
   };
 
