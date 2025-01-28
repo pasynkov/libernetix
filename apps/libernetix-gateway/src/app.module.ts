@@ -2,8 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { LibernetixConnectorModule } from './modules/libernetix-connector/libernetix-connector.module';
-import { LibernetixConnectorService } from './modules/libernetix-connector/libernetix-connector.service';
+import {
+  LibernetixConnectorModule,
+  LibernetixS2sConnectorModule
+} from './modules/libernetix';
 
 @Module({
   imports: [
@@ -11,6 +13,7 @@ import { LibernetixConnectorService } from './modules/libernetix-connector/liber
       isGlobal: true,
     }),
     LibernetixConnectorModule,
+    LibernetixS2sConnectorModule,
   ],
   controllers: [AppController],
   providers: [
