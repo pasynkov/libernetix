@@ -157,9 +157,10 @@ describe('AppController (e2e)', () => {
       });
   });
 
-  it('POST /v1/purchase', async () => {
+  it('POST /v1/purchase with simple charge', async () => {
     await request(app.getHttpServer())
       .post('/v1/purchase')
+      .set('Referer', 'http://localhost')
       .send({
         client: {
           email: 'test@email.com',
@@ -167,6 +168,8 @@ describe('AppController (e2e)', () => {
           screen_width: 900,
           language: 'ru-RU',
           utc_offset: -120,
+          success_route: 'none',
+          failed_route: 'none',
         },
         card: {
           card_number: '4444333322221111',
@@ -179,7 +182,71 @@ describe('AppController (e2e)', () => {
       })
       .expect(201)
       .expect(({ body }) => {
-        console.log(body);
+        expect(body).toEqual(expect.objectContaining({
+          status: 'executed',
+        }));
+      });
+  });
+
+  it('POST /v1/purchase with 3ds charge', async () => {
+    await request(app.getHttpServer())
+      .post('/v1/purchase')
+      .set('Referer', 'http://localhost')
+      .send({
+        client: {
+          email: 'test@email.com',
+          screen_height: 1000,
+          screen_width: 900,
+          language: 'ru-RU',
+          utc_offset: -120,
+          success_route: 'none',
+          failed_route: 'none',
+        },
+        card: {
+          card_number: '5555555555554444',
+          expires: '12/25',
+          cardholder_name: 'Nikolay Pasynkov',
+          cvc: '123',
+        },
+        amount: 2,
+        currency: 'EUR',
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body).toEqual(expect.objectContaining({
+          status: '3DS_required',
+        }));
+      });
+  });
+
+  it('POST /v1/purchase with fake card', async () => {
+    await request(app.getHttpServer())
+      .post('/v1/purchase')
+      .set('Referer', 'http://localhost')
+      .send({
+        client: {
+          email: 'test@email.com',
+          screen_height: 1000,
+          screen_width: 900,
+          language: 'ru-RU',
+          utc_offset: -120,
+          success_route: 'none',
+          failed_route: 'none',
+        },
+        card: {
+          card_number: '1111111111111111', // todo do we need card number validation on own side?
+          expires: '12/25',
+          cardholder_name: 'Nikolay Pasynkov',
+          cvc: '123',
+        },
+        amount: 2,
+        currency: 'EUR',
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body).toEqual(expect.objectContaining({
+          status: 'error',
+        }));
       });
   });
 

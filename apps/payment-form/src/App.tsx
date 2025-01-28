@@ -13,11 +13,11 @@ interface FormData {
 
 function App() {
 
-  const [run] = useState(0);
+  const [successful, setSuccessful] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<string[]>([]);
 
-  const [formData, setFormData] = useState<FormData>({
+  const formInitial: FormData = {
     cardNumber: "4444333322221111",
     cardHolder: "Nikolay Pasynkov",
     expiryDate: "12/25",
@@ -25,7 +25,13 @@ function App() {
     cvv: "123",
     amount: "10",
     currency: "EUR",
-  });
+  };
+
+  const [formData, setFormData] = useState<FormData>(formInitial);
+
+  useEffect(() => {
+    setFormData(formInitial)
+  }, [successful]);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement> = (e) => {
     let { name, value } = e.target;
@@ -37,6 +43,7 @@ function App() {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+    setSuccessful(false);
     const body = JSON.stringify({
       client: {
         email: formData.email,
@@ -75,14 +82,10 @@ function App() {
       } else if (r.statusCode >= 500) {
         setErrors(['Something went wrong with payment service']);
       } else {
-        setErrors([r.message]);
+        setSuccessful(true);
       }
     });
   };
-
-  function submit(e: any) {
-    e.preventDefault();
-  }
 
   return (
     <div className="App">
@@ -91,7 +94,7 @@ function App() {
           Simple donation form
         </p>
       </header>
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }} hidden={successful}>
 
         <div>
           <label>Email:</label>
@@ -187,6 +190,14 @@ function App() {
           Pay Now
         </button>
       </form>
+
+      <div className={"success"} hidden={!successful}>
+
+        Payment successful
+
+        <button onClick={() => setSuccessful(false)}>New Payment</button>
+
+      </div>
     </div>
   );
 }

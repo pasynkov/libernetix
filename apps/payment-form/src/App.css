@@ -27,6 +27,10 @@
   color: red;
 }
 
+.success {
+  color: green;
+}
+
 .App-link {
   color: #61dafb;
 }

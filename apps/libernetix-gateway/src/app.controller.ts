@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Ip, Post, VERSION_NEUTRAL } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Headers, Ip, Post, VERSION_NEUTRAL } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PurchaseRequestDto } from './dto/purchase.request.dto';
 
@@ -19,6 +19,16 @@ export class AppController {
   ): Promise<any> {
     const ip = (xForwardedFor ?? ipAddress).split(',').shift();
 
+    let successRedirect: string;
+    let failureRedirect: string;
+
+    try {
+      successRedirect = new URL(request.client.success_route, referer).toString();
+      failureRedirect = new URL(request.client.failed_route, referer).toString();
+    } catch (e) {
+      throw new BadRequestException('Referer is not provided');
+    }
+
     return this.appService.donationPayment(request, {
       ip,
       userAgent,
@@ -26,8 +36,8 @@ export class AppController {
       screenHeight: request.client.screenHeight,
       language: request.client.language,
       utcOffset: request.client.utcOffset,
-      successRedirect: new URL(request.client.success_route, referer).toString(),
-      failureRedirect: new URL(request.client.failed_route, referer).toString(),
+      successRedirect,
+      failureRedirect,
     });
   }
 }
