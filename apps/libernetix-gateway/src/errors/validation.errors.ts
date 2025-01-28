@@ -1,0 +1,18 @@
+export enum ValidationErrors {
+  INVALID_CURRENCY = 'Invalid currency',
+  INVALID_EMAIL = 'Invalid email',
+  INVALID_AMOUNT = 'Invalid amount',
+  INVALID_CARD_NUMBER = 'Invalid card number',
+  INVALID_CARDHOLDER_NAME = 'Invalid cardholder name',
+  INVALID_EXPIRATION_DATE = 'Invalid expiration date',
+  INVALID_EXPIRATION_YEAR = 'Invalid expiration year',
+  INVALID_CVC = 'Invalid cvc',
+  INVALID_CREDIT_CARD = 'Invalid credit card',
+  INVALID_ISO4217_CURRENCY_CODE = 'Invalid ISO 4217 currency code',
+  INVALID_SCREEN_HEIGHT = 'Invalid screen height',
+  INVALID_SCREEN_WIDTH = 'Invalid screen width',
+  CARD_IS_EMPTY = 'Card is empty',
+  CLIENT_IS_EMPTY = 'Client is empty',
+  CURRENCY_IS_EMPTY = 'Currency is empty',
+  AMOUNT_IS_EMPTY = 'Amount is empty',
+}
