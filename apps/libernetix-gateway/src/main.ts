@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
+import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 async function bootstrap() {
-  const app = await NestFactory.create(
+  const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   );
@@ -16,6 +16,6 @@ async function bootstrap() {
     defaultVersion: '1',
   })
   app.setGlobalPrefix(configService.get('GLOBAL_PREFIX'));
-  await app.listen(configService.get('PORT') ? parseInt(configService.get('PORT'), 10) : 3000);
+  await app.listen( configService.get('PORT') ? parseInt(configService.get('PORT'), 10) : 3000, '0.0.0.0');
 }
 bootstrap();

@@ -163,6 +163,10 @@ describe('AppController (e2e)', () => {
       .send({
         client: {
           email: 'test@email.com',
+          screen_height: 1000,
+          screen_width: 900,
+          language: 'ru-RU',
+          utc_offset: -120,
         },
         card: {
           card_number: '4444333322221111',

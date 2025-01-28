@@ -7,4 +7,6 @@ export interface PurchaseInput {
   currency: string;
   email: string;
   products: PurchaseInputProduct[];
+  successRedirect: string;
+  failureRedirect: string;
 }
