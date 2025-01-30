@@ -1,6 +1,6 @@
 # Libernetix example service
 
-First of all you have to rename `./apps/libernetix-gateway/.env.example` to `./apps/libernetix/.env` and set the environment variables.
+First of all you have to rename `./apps/libernetix-gateway/.env.example` to `./apps/libernetix-gateway/.env` and set the environment variables.
 
 
 ## docker compose start
