@@ -6,7 +6,7 @@ First of all you have to rename `./apps/libernetix/.env.example` to `./apps/libe
 ## docker compose start
 
 ```bash
-docker compose up --build --force-create
+docker compose up --build --force-recreate
 ```
 Open http://localhost/ in your browser.
 
