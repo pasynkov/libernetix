@@ -13,7 +13,7 @@ interface FormData {
 
 function App() {
 
-  const [successful, setSuccessful] = useState<boolean>(false);
+  const [successful, setSuccessful] = useState<string>('');
 
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -43,7 +43,7 @@ function App() {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    setSuccessful(false);
+    setSuccessful('');
     const body = JSON.stringify({
       client: {
         email: formData.email,
@@ -82,7 +82,15 @@ function App() {
       } else if (r.statusCode >= 500) {
         setErrors(['Something went wrong with payment service']);
       } else {
-        setSuccessful(true);
+        setErrors([]);
+        if (r.status === 'error') {
+          setErrors(['Payment unsessful']);
+        } else if (r.status === 'executed') {
+          setSuccessful('Payment successful');
+        } else {
+          // todo 3ds
+          setSuccessful('Need 3DS');
+        }
       }
     });
   };
@@ -94,7 +102,7 @@ function App() {
           Simple donation form
         </p>
       </header>
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }} hidden={successful}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }} hidden={successful !== ''}>
 
         <div>
           <label>Email:</label>
@@ -191,11 +199,11 @@ function App() {
         </button>
       </form>
 
-      <div className={"success"} hidden={!successful}>
+      <div className={"success"} hidden={successful === ''}>
 
-        Payment successful
+        {successful}
 
-        <button onClick={() => setSuccessful(false)}>New Payment</button>
+        <button onClick={() => setSuccessful('')}>New Payment</button>
 
       </div>
     </div>
